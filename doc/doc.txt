@@ -1,0 +1,8 @@
+Major Features:
+1. Authentication
+- sign up, login, manual and social auth, profile
+2. Layout
+3. Course
+4. Analytics
+5. Orders
+6. Notification
