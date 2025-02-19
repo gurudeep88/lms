@@ -197,11 +197,9 @@ export const updatePassword = CatchAsyncError(async(req: Request, res: Response,
         }
         const userId = req.user?._id as string;       
         const user = await User.findById(userId).select('+password');
-        console.log('suer ', user, req.user, user?.password)
         if(user?.password === undefined){
             return next(createError("Invalid user", 400));   
         }
-        console.log('invalid ', user, req.user)
         const isPasswordMatch = await user?.comparePassword(oldPassword);
         if(!isPasswordMatch){
             return next(createError("Invalid old password", 400));   

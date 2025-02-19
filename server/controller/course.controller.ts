@@ -76,14 +76,12 @@ export const getCourse = CatchAsyncError(async(req: Request, res: Response, next
 //get single course -- without purchase --everyone can take it
 export const listCourses = CatchAsyncError(async(req: Request, res: Response, next: NextFunction) => {
     try {
-        console.log('sdfg')
         const AreCoursesCached = await redis.get(REDIS_ALL_COURSES_KEY);
         if(AreCoursesCached){
             const courses = JSON.parse(AreCoursesCached);
             return httpResponse(res, 200, courses, SUCCESS);
         }
         const courses = await Course.find().select(PROHIBITED_COURSE_FIELDS);
-        console.log('cour', courses);
         await redis.set(REDIS_ALL_COURSES_KEY, JSON.stringify(courses));
         httpResponse(res, 200, courses, SUCCESS);
     } catch (error: any) {
@@ -190,7 +188,6 @@ export const addReply = CatchAsyncError(async(req: Request, res: Response, next:
                     data
                 });
             } catch (error: any) {
-                console.log('e', error)
                 return next(createError(error.message, 400));
             }
         }
@@ -209,7 +206,6 @@ export const addReview = CatchAsyncError(async(req: Request, res: Response, next
         const userCourseList = user?.courses as any;
         const courseId = req.params?.id;
         const isCourseExisted = userCourseList?.some((course: any) => course._id === courseId);
-        console.log('dffwedf')
         if(!isCourseExisted){
             return next(createError("You are not eligible to access this course", 403));
         }

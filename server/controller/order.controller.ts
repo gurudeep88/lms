@@ -17,7 +17,6 @@ export const createOrder = CatchAsyncError(async(req: Request, res: Response, ne
         const { courseId, paymentInfo } = req.body as IOrder;
         const user = await User.findById(req.user?._id);
         const courses = user?.courses;
-        console.log('user, ',user, courseId);
         const isCourseExistedInUser = courses?.some((course: any) => course._id.toString() === courseId);
         if(isCourseExistedInUser){
             return next(createError(COURSE_ALREADY_PURCHASED, 409));
@@ -57,7 +56,6 @@ export const createOrder = CatchAsyncError(async(req: Request, res: Response, ne
         
         user?.courses?.push(course?._id as { courseId: string; } );
         if(course.purchased !== undefined) {course.purchased += 1 };
-        console.log('course', course, user);
         await course.save();
         await user?.save();
 
