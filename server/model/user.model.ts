@@ -3,11 +3,7 @@ import bcrypt from 'bcryptjs';
 import { IUser } from "../interface/user.interface";
 import { EMAIL_PATTERN } from "../constants/regExp";
 import { SALT } from "../constants/db.constant";
-import { ROLES } from "../constants/enum";
-import jwt from 'jsonwebtoken';
-import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../config";
-import { ACCESS_TOKEN_EXPIRE, REFRESH_TOKEN_EXPIRE } from "../config/port.config";
-import { MINUTES_TO_MILLISECONDS } from "../constants/cookie.constant";
+import { ROLES } from "../constants/user.constant";
 import { signAccessToken, signRefreshToken } from "../utils/jwt";
 
 const userSchema: Schema<IUser> = new Schema({

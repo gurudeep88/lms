@@ -5,11 +5,12 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET } from "../config";
 import { redis } from "../database/redis";
 import { LMS_ACCESS_TOKEN } from '../constants/cookie.constant';
+import { LOGIN_AGAIN } from "../constants/http.constant";
 
 export const isAuthenticated = CatchAsyncError(async(req: Request, res: Response, next: NextFunction) => {
     const access_token = req.cookies[LMS_ACCESS_TOKEN];
     if(!access_token){
-        return next(createError("Please login to access this resource!", 401));
+        return next(createError(LOGIN_AGAIN, 401));
     }
     const decodedAccessToken = jwt.verify(access_token, ACCESS_TOKEN_SECRET) as JwtPayload;
     if(!decodedAccessToken){
@@ -17,7 +18,7 @@ export const isAuthenticated = CatchAsyncError(async(req: Request, res: Response
     }
     const user = await redis.get(decodedAccessToken.id);
     if(!user){
-        return next(createError("User not found!", 400));
+        return next(createError(LOGIN_AGAIN, 400));
     }
     req.user = JSON.parse(user);
     next();
