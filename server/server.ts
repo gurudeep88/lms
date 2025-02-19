@@ -6,9 +6,6 @@ import connectDB from './database/mongo';
 import { ErrorMiddleware } from './middleware/ErrorMiddleware';
 import { CLOUD_API_KEY, CLOUD_NAME, CLOUD_SECRET_KEY } from './config';
 
-console.log('first',  CLOUD_NAME,
-    CLOUD_API_KEY,
-     CLOUD_SECRET_KEY)
 // cloudinary config
 v2.config({
     cloud_name: CLOUD_NAME,

@@ -1,0 +1,1 @@
+export const PROHIBITED_COURSE_FIELDS = "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links";

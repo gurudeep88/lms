@@ -5,9 +5,10 @@ import { ACCESS_TOKEN_EXPIRE, REFRESH_TOKEN_EXPIRE } from "../config/port.config
 import { ACCESS_TOKEN_SECRET, NODE_ENV, REFRESH_TOKEN_SECRET } from "../config";
 import { httpResponse } from "../helper/api";
 import { redis } from "../database/redis";
-import { LMS_ACCESS_TOKEN, LMS_REFRESH_TOKEN, MINUTES_TO_MILLISECONDS } from "../constants/cookie.constant";
+import { LMS_ACCESS_TOKEN, LMS_REFRESH_TOKEN } from "../constants/cookie.constant";
 import jwt from 'jsonwebtoken';
 import { setCookie } from "./cookie.utils";
+import { MINUTE_TO_MILLISECONDS } from "../constants";
 
 export const sendToken = (res: Response, user: IUser, statusCode: number) => {
     const accessToken = user.signAccessToken();
@@ -29,11 +30,11 @@ export const accessTokenExpire = ACCESS_TOKEN_EXPIRE || DEFAULT_ACCESS_TOKEN_EXP
 export const refreshTokenExpire = REFRESH_TOKEN_EXPIRE || DEFAULT_REFRESH_TOKEN_EXPIRE;
 
 export const tokenExpiresForCookie = (tokenExpiresAt: number): Date => {
-    return new Date(Date.now() + tokenExpiresAt * MINUTES_TO_MILLISECONDS)
+    return new Date(Date.now() + tokenExpiresAt * MINUTE_TO_MILLISECONDS)
 }
 
 export const maxTokenAgeForCookie = (tokenExpiresAt: number) => {
-    return tokenExpiresAt * MINUTES_TO_MILLISECONDS;
+    return tokenExpiresAt * MINUTE_TO_MILLISECONDS;
 }
 
 
@@ -65,7 +66,7 @@ export const signAccessToken = (payload: { id: string}) => {
     return signJwtToken(
         payload, 
         ACCESS_TOKEN_SECRET, 
-        { expiresIn: ACCESS_TOKEN_EXPIRE * MINUTES_TO_MILLISECONDS }
+        { expiresIn: ACCESS_TOKEN_EXPIRE * MINUTE_TO_MILLISECONDS }
     )
 }
 
@@ -73,6 +74,6 @@ export const signRefreshToken = (payload: { id: string}) => {
     return signJwtToken(
         payload, 
         REFRESH_TOKEN_SECRET, 
-        { expiresIn: REFRESH_TOKEN_EXPIRE * MINUTES_TO_MILLISECONDS }
+        { expiresIn: REFRESH_TOKEN_EXPIRE * MINUTE_TO_MILLISECONDS }
     )
 }

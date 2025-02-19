@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> <%= appName %> | Order Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+        .order-details {
+            font-size: 16px;
+            color: #555;
+        }
+        .order-details th {
+            text-align: left;
+            padding-bottom: 8px;
+        }
+        .order-details td {
+            padding-bottom: 12px;
+        }
+        .footer {
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <h2><%= appName %> | Order Confirmation</h2>
+
+        <p>Dear Customer,</p>
+        <p>Thank you for your purchase! Below are the details of your order:</p>
+
+        <h4>Here's what you have ordered:</h4>
+
+        <table class="order-details" width="100%">
+            <tr>
+                <th>Order ID: <%= order._id %></th>
+                <th>Order Date: <%= order.date %></th>
+            </tr>
+        </table>
+        <table class="order-details" width="100%">
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Cost</th>
+            </tr>
+            <tr>
+                <td><%= order.name %></td>
+                <td>1</td>
+                <td>$<%= order.price.toFixed(2) %></td>
+            </tr>
+        </table>
+        <table class="order-details" width="100%" style="border-top: 1px solid #000;">
+            <tr>
+                <td class="col-10">Subtotal: </td>
+                <td>$<%= order.price.toFixed(2) %></td>
+            </tr>
+        </table>
+        <table class="order-details" width="100%">
+            <tr>
+                <td class="col-10">Total:</td>
+                <td>$<%= order.price.toFixed(2) %></td>
+            </tr>
+        </table>
+
+
+        <div class="footer">
+        <p>
+            If you have any questions, feel free to reach out to our support team at 
+            <a href="mailto:support@avpra.com"></a>.
+        </p>
+        <p>&copy; 2025 <%= appName %>. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import ejs from 'ejs';
-import { v2 } from 'cloudinary';
 import { IActivationRequest, ILoginRequest, IRegistrationBody, ISocialAuthBody, IUpdatePasswordBody, IUpdateProfilePicture, IUpdateUserInfoBody, IUser } from "../interface/user.interface";
 import { createError } from "../helper/error";
 import { User } from "../model";
@@ -8,16 +7,19 @@ import { createActivationToken } from "../utils/user.utils";
 import { CatchAsyncError } from "../middleware/CatchAsyncError";
 import path from "path";
 import { sendEmail } from "../helper/sendEmail";
-import { ACCESS_TOKEN_SECRET, APP_NAME, REFRESH_TOKEN_SECRET, TOKEN_ACTIVATION_SECRET } from "../config";
+import { APP_NAME, REFRESH_TOKEN_SECRET, TOKEN_ACTIVATION_SECRET } from "../config";
 import { httpResponse } from "../helper/api";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { accessTokenOptions, refreshTokenOptions, sendToken, signAccessToken, signRefreshToken } from "../utils/jwt";
-import { LMS_ACCESS_TOKEN, LMS_REFRESH_TOKEN, MINUTES_TO_MILLISECONDS } from "../constants/cookie.constant";
+import { LMS_ACCESS_TOKEN, LMS_REFRESH_TOKEN } from "../constants/cookie.constant";
 import { MAX_AGE_TO_EMPTY_COOKIE } from "../config/number.constant";
 import { redis } from "../database/redis";
-import { ACCESS_TOKEN_EXPIRE, REFRESH_TOKEN_EXPIRE } from "../config/port.config";
 import { setCookie } from "../utils/cookie.utils";
 import { getUserById } from "../services/user.service";
+import { SEVEN_DAYS_TO_SECONDS, SUCCESS } from "../constants";
+import { deleteFromCloudinary, uploadToCloudinary } from "../services/cloudinary.service";
+import { CLOUDINARY_FOLDER, CLOUDINARY_IMAGE_WIDTH } from "../constants/cloudinary.constant";
+import { LOGIN_AGAIN } from "../constants/http.constant";
 
 export const register = CatchAsyncError(async(req: Request, res: Response, next: NextFunction) => {
     try {
@@ -122,7 +124,7 @@ export const updateAccessToken = CatchAsyncError(async(req: Request, res: Respon
         }
         const session = await redis.get(decodedRefreshToken.id);
         if(!session){
-            return next(createError(errorMessage, 400));
+            return next(createError(LOGIN_AGAIN, 400));
         }
         const user = JSON.parse(session);
         const accessToken =  signAccessToken({id: user._id});
@@ -130,6 +132,8 @@ export const updateAccessToken = CatchAsyncError(async(req: Request, res: Respon
         req.user = user;
         setCookie(res, LMS_ACCESS_TOKEN, accessToken, accessTokenOptions);
         setCookie(res, LMS_REFRESH_TOKEN, refreshToken, refreshTokenOptions);
+
+        await redis.set(user._id, JSON.stringify(user), "EX", SEVEN_DAYS_TO_SECONDS);
 
         return httpResponse(res, 200, {status: "success", accessToken })
         
@@ -179,10 +183,7 @@ export const updateUserInfo = CatchAsyncError(async(req: Request, res: Response,
         }
         await user?.save();
         await redis.set(userId as string, JSON.stringify(user));
-        return httpResponse(res, 204, {
-            success: true,
-            user
-        })
+        return httpResponse(res, 201, user, SUCCESS)
     } catch (error:any) {
         return next(createError(error.message, 400));   
     }
@@ -208,10 +209,7 @@ export const updatePassword = CatchAsyncError(async(req: Request, res: Response,
         user.password = newPassword;
         await user.save();
         await redis.set(userId, JSON.stringify(user));
-        return httpResponse(res, 204, {
-            success: true, 
-            user
-        })
+        return httpResponse(res, 201, user, SUCCESS)
     } catch (error: any) {
         return next(createError(error.message, 400));   
     }
@@ -230,23 +228,19 @@ export const updateAvatar = CatchAsyncError(async(req: Request, res: Response, n
         }
         const publicId = user?.avatar?.public_id;
         if(publicId){
-            await v2.uploader.destroy(publicId);
+            await deleteFromCloudinary(publicId);
         }else{
-            const cloud = await v2.uploader.upload(avatar, {
-                folder: "avatars",
-                width: 150
-            });
+            const { public_id, url } = await uploadToCloudinary(
+                avatar, CLOUDINARY_FOLDER.Avatars, CLOUDINARY_IMAGE_WIDTH.Avatar
+            )
             user.avatar = {
-                public_id: cloud.public_id,
-                url: cloud.secure_url
+                public_id,
+                url
             }
         }
         await user.save();
         await redis.set(userId, JSON.stringify(user));
-        return httpResponse(res, 200, {
-            success: true,
-            user
-        })
+        return httpResponse(res, 200, user, SUCCESS)
     } catch (error: any) {
         return next(createError(error.message, 400));   
     }

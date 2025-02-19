@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import { httpResponse } from './helper/api';
 import { createError } from './helper/error';
-import { user } from './routes/index.route';
+import { user, course, order, notification, analytics, layout } from './routes/index.route';
 const { ORIGIN } = process.env;
 
 export const app = express();
@@ -19,6 +19,11 @@ app.use(cors({
 
 // routes
 app.use('/api/v1', user);
+app.use('/api/v1', course);
+app.use('/api/v1', order);
+app.use('/api/v1', notification);
+app.use('/api/v1', analytics);
+app.use('/api/v1', layout);
 
 
 //testing api

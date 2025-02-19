@@ -1,2 +1,9 @@
-
-export * from './user.controller';
+export * as course from './course.controller';
+export * as user from './user.controller';
+export * as order from './order.controller';
+export * as adminNotification from './admin/notification.controller';
+export * as adminCourse from './admin/course.controller';
+export * as adminOrder from './admin/order.controller';
+export * as adminUser from './admin/user.controller';
+export * as adminAnalytics from './admin/analytics.controller';
+export * as adminLayout from './admin/layout.controller';

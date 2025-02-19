@@ -14,6 +14,19 @@ export interface IUser extends Document {
     signRefreshToken:() => string;
 }
 
+export interface IRequestUser {
+    avatar: IUpdateProfilePictureBody;
+    _id: string;
+    name: string;
+    email: string;
+    password: string;
+    role: string;
+    isVerified: boolean,
+    courses:  Array<{_id: string}>;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 export interface IRegistrationBody {
     name: string;
     email: string;
